@@ -1,15 +1,18 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ColumnFilter, Table } from 'primeng/table';
-import { Customer, Representative } from '../../domain/customer';
-import { CustomerService } from '../../service/customerservice';
+import { Component, OnInit, QueryList, ViewChildren } from "@angular/core";
+import { ColumnFilter, ColumnFilterFormElement, Table } from "primeng/table";
+import { Customer, Representative } from "../../domain/customer";
+import { CustomerService } from "../../service/customerservice";
+import { FilterMetadata } from "primeng/api";
 
 @Component({
-  selector: 'table-filter-menu-demo',
-  templateUrl: 'table-filter-menu-demo.html',
-  styleUrls: ['table-filter-menu-demo.scss'],
+  selector: "table-filter-menu-demo",
+  templateUrl: "table-filter-menu-demo.html",
+  styleUrls: ["table-filter-menu-demo.scss"],
 })
 export class TableFilterMenuDemo implements OnInit {
-  @ViewChild(ColumnFilter) vc: ElementRef;
+  @ViewChildren(ColumnFilter) columnFilters: QueryList<ColumnFilter>;
+  @ViewChildren(ColumnFilterFormElement)
+  dynamicElements!: QueryList<ColumnFilterFormElement>;
   customers: Customer[];
 
   representatives: Representative[];
@@ -23,7 +26,16 @@ export class TableFilterMenuDemo implements OnInit {
   constructor(private customerService: CustomerService) {}
 
   ngAfterViewChecked() {
-    console.log('vc', this.vc);
+    this.columnFilters.forEach((columnFilter) => {
+      const originalFunc = columnFilter.onMenuMatchModeChange;
+      columnFilter.onMenuMatchModeChange = function (
+        value: any,
+        filterMeta: FilterMetadata
+      ) {
+        originalFunc.call(this, value, filterMeta);
+        console.log(value, filterMeta);
+      };
+    });
   }
 
   ngOnInit() {
@@ -37,25 +49,25 @@ export class TableFilterMenuDemo implements OnInit {
     });
 
     this.representatives = [
-      { name: 'Amy Elsner', image: 'amyelsner.png' },
-      { name: 'Anna Fali', image: 'annafali.png' },
-      { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-      { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-      { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-      { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-      { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-      { name: 'Onyama Limba', image: 'onyamalimba.png' },
-      { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-      { name: 'Xuxue Feng', image: 'xuxuefeng.png' },
+      { name: "Amy Elsner", image: "amyelsner.png" },
+      { name: "Anna Fali", image: "annafali.png" },
+      { name: "Asiya Javayant", image: "asiyajavayant.png" },
+      { name: "Bernardo Dominic", image: "bernardodominic.png" },
+      { name: "Elwin Sharvill", image: "elwinsharvill.png" },
+      { name: "Ioni Bowcher", image: "ionibowcher.png" },
+      { name: "Ivan Magalhaes", image: "ivanmagalhaes.png" },
+      { name: "Onyama Limba", image: "onyamalimba.png" },
+      { name: "Stephen Shaw", image: "stephenshaw.png" },
+      { name: "Xuxue Feng", image: "xuxuefeng.png" },
     ];
 
     this.statuses = [
-      { label: 'Unqualified', value: 'unqualified' },
-      { label: 'Qualified', value: 'qualified' },
-      { label: 'New', value: 'new' },
-      { label: 'Negotiation', value: 'negotiation' },
-      { label: 'Renewal', value: 'renewal' },
-      { label: 'Proposal', value: 'proposal' },
+      { label: "Unqualified", value: "unqualified" },
+      { label: "Qualified", value: "qualified" },
+      { label: "New", value: "new" },
+      { label: "Negotiation", value: "negotiation" },
+      { label: "Renewal", value: "renewal" },
+      { label: "Proposal", value: "proposal" },
     ];
   }
 
@@ -65,19 +77,19 @@ export class TableFilterMenuDemo implements OnInit {
 
   getSeverity(status) {
     switch (status.toLowerCase()) {
-      case 'unqualified':
-        return 'danger';
+      case "unqualified":
+        return "danger";
 
-      case 'qualified':
-        return 'success';
+      case "qualified":
+        return "success";
 
-      case 'new':
-        return 'info';
+      case "new":
+        return "info";
 
-      case 'negotiation':
-        return 'warning';
+      case "negotiation":
+        return "warning";
 
-      case 'renewal':
+      case "renewal":
         return null;
     }
   }
